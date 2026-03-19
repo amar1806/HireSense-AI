@@ -132,7 +132,7 @@ def upload_resume(request):
         results = sorted(results, key=lambda x: x['score'], reverse=True)
 
         # Get subscription info
-        is_premium = False
+        is_premium_user = False
         premium_ends = None
         plan_name = None
         days_remaining = 0
@@ -140,7 +140,7 @@ def upload_resume(request):
 
         try:
             subscription = Subscription.objects.get(user=request.user)
-            is_premium = subscription.is_premium_active()
+            is_premium_user = subscription.is_premium_active()
             premium_ends = subscription.end_date
             plan_name = subscription.plan
             days_remaining = subscription.get_days_remaining()
@@ -150,7 +150,7 @@ def upload_resume(request):
 
         return render(request, "dashboard.html", {
             "results": results,
-            "is_premium": is_premium,
+            "is_premium": is_premium_user,
             "premium_ends": premium_ends,
             "plan_name": plan_name,
             "days_remaining": days_remaining,
