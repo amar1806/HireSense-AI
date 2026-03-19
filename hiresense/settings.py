@@ -20,12 +20,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1ak)n(kg#h*(yru$*-)tbj@j-5qxld-j52+u2a58pmh54b0xa0'
+# In production: set DJANGO_SECRET_KEY in the environment.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-local-dev-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DJANGO_DEBUG=False in production environment.
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = []
+# Hosts/domain names that are valid for this site
+# Example: DJANGO_ALLOWED_HOSTS=example.com,localhost
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -126,16 +130,16 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'jeet212427@gmail.com'
-EMAIL_HOST_PASSWORD = 'Komal@123'
+EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('DJANGO_EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('DJANGO_EMAIL_USE_TLS', 'True').lower() in ('1', 'true', 'yes')
+EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD', '')
 
 # Razorpay Configuration
 # Get these from https://dashboard.razorpay.com/
 # Use test keys for development: https://razorpay.com/docs/payments/dashboard/test-mode/
-RAZORPAY_KEY_ID = 'rzp_test_SSxPmOhewYF5uS'  # Replace with actual test/live key
-RAZORPAY_KEY_SECRET = 'eg1ehNKsLhPSoenb9gbMaSYA'  # Replace with actual test/live secret
-RAZORPAY_WEBHOOK_SECRET = 'your_webhook_secret_here'  # For webhook verification (optional)
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', '')  # Replace with actual test/live key
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', '')  # Replace with actual test/live secret
+RAZORPAY_WEBHOOK_SECRET = os.environ.get('RAZORPAY_WEBHOOK_SECRET', '')  # For webhook verification (optional)
