@@ -350,7 +350,16 @@
         <p class="page-subtitle">Manage your subscription & resume analysis</p>
       </div>
 
-      {% if is_premium %}
+      {% if upload_errors %}
+      <div class="alert alert-warning" role="alert">
+        <h5 class="alert-heading">Upload warnings</h5>
+        <ul>
+          {% for err in upload_errors %}
+          <li>{{ err }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %} {% if is_premium %}
       <div class="premium-banner">
         <div class="premium-badge">
           <div class="premium-badge-icon">👑</div>

@@ -1,8 +1,12 @@
-import pickle
 import os
-from urllib import request
+import pickle
+import uuid
+from pathlib import Path
 
+from django.conf import settings
+from django.core.files.storage import default_storage
 from django.shortcuts import render, redirect
+from django.utils.text import get_valid_filename
 from sklearn.metrics.pairwise import cosine_similarity
 
 from .resume_parser import extract_resume_text
@@ -16,8 +20,9 @@ from .utils import is_premium
 
 
 # Load ML model
-model = pickle.load(open("ml_model/model.pkl", "rb"))
-vectorizer = pickle.load(open("ml_model/vectorizer.pkl", "rb"))
+ML_MODEL_DIR = Path(__file__).resolve().parent.parent / 'ml_model'
+model = pickle.load(open(ML_MODEL_DIR / 'model.pkl', 'rb'))
+vectorizer = pickle.load(open(ML_MODEL_DIR / 'vectorizer.pkl', 'rb'))
 
 
 # =========================
@@ -42,18 +47,44 @@ def upload_resume(request):
         role = request.POST.get("role", "software_engineer")
 
         results = []
+        upload_errors = []
 
         for resume in resumes:
 
-            # Save file
-            file_path = os.path.join("media", resume.name)
+            # Validate file type & size
+            file_ext = os.path.splitext(resume.name)[1].lower()
+            if file_ext not in settings.ALLOWED_UPLOAD_EXTENSIONS:
+                upload_errors.append(
+                    f"Skipped {resume.name}: unsupported file type ({file_ext}). Allowed: {', '.join(settings.ALLOWED_UPLOAD_EXTENSIONS)}"
+                )
+                continue
 
-            with open(file_path, 'wb+') as f:
-                for chunk in resume.chunks():
-                    f.write(chunk)
+            if resume.size > settings.MAX_UPLOAD_SIZE:
+                upload_errors.append(
+                    f"Skipped {resume.name}: exceeds max upload size of {settings.MAX_UPLOAD_SIZE // (1024 * 1024)} MB."
+                )
+                continue
+
+            # Save file safely to MEDIA_ROOT and avoid path traversal issues
+            os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+            safe_name = get_valid_filename(resume.name)
+            stored_name = f"{uuid.uuid4().hex}_{safe_name}"
+
+            saved_name = default_storage.save(stored_name, resume)
+            try:
+                file_path = default_storage.path(saved_name)
+            except Exception:
+                # Some storage backends may not support .path()
+                file_path = os.path.join(settings.MEDIA_ROOT, saved_name)
 
             # Extract text
             resume_text = extract_resume_text(file_path)
+
+            # Clean up the uploaded file after parsing
+            try:
+                default_storage.delete(saved_name)
+            except Exception:
+                pass
 
             if not resume_text:
                 resume_text = ""
@@ -155,6 +186,7 @@ def upload_resume(request):
             "plan_name": plan_name,
             "days_remaining": days_remaining,
             "auto_renew": auto_renew,
+            "upload_errors": upload_errors,
         })
 
     return render(request, "upload.html")
@@ -199,6 +231,7 @@ def dashboard(request):
         "plan_name": plan_name,
         "days_remaining": days_remaining,
         "auto_renew": auto_renew,
+        "upload_errors": [],
     })
 
 # ================= 
@@ -233,7 +266,10 @@ def generate_resume(request):
         skills_list = skills.split(",") if skills else []
 
         # Generate PDF
-        pdf_path = os.path.join("media", f"resume_{request.user.username}.pdf")
+        os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+        safe_user = get_valid_filename(str(request.user.username))
+        stored_name = f"resume_{safe_user}_{uuid.uuid4().hex}.pdf"
+        pdf_path = os.path.join(settings.MEDIA_ROOT, stored_name)
 
         generate_resume_pdf(
             {

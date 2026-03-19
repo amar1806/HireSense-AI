@@ -129,6 +129,12 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Upload validation settings
+# Limit file size (in bytes) for uploaded resumes. Default is 5 MB.
+MAX_UPLOAD_SIZE = int(os.environ.get('DJANGO_MAX_UPLOAD_SIZE', 5 * 1024 * 1024))
+# Allowed file extensions for resume uploads (comma-separated list)
+ALLOWED_UPLOAD_EXTENSIONS = [ext.strip().lower() for ext in os.environ.get('DJANGO_ALLOWED_EXTENSIONS', '.pdf,.doc,.docx,.txt').split(',')]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
