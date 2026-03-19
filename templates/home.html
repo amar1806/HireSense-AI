@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>HireSense AI</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+
+    <style>
+      /* ================= GLOBAL ================= */
+      body {
+        margin: 0;
+        font-family: Segoe UI;
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        color: white;
+      }
+
+      /* ================= NAVBAR ================= */
+      .navbar-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 40px;
+        background: #0a0a0a;
+      }
+
+      .logo {
+        font-size: 20px;
+        font-weight: 600;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 6px 12px;
+        border-radius: 20px;
+      }
+
+      .btn-logout {
+        background: #ff4d4d;
+        padding: 6px 12px;
+        border-radius: 20px;
+        color: white;
+        text-decoration: none;
+      }
+
+      .btn-upgrade {
+        background: linear-gradient(90deg, #00dbde, #fc00ff);
+        padding: 8px 16px;
+        border-radius: 20px;
+        color: white;
+        text-decoration: none;
+      }
+
+      .btn-login {
+        background: transparent;
+        border: 1px solid white;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+      }
+
+      .profile-menu {
+        position: relative;
+      }
+
+      .profile-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.08);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.2s;
+      }
+
+      .profile-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-1px);
+      }
+
+      .profile-dropdown {
+        position: absolute;
+        right: 0;
+        top: 48px;
+        background: rgba(0, 0, 0, 0.85);
+        border-radius: 12px;
+        padding: 10px 0;
+        min-width: 150px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        display: none;
+        z-index: 50;
+      }
+
+      .profile-dropdown.show {
+        display: block;
+      }
+
+      .profile-dropdown a {
+        display: block;
+        padding: 10px 16px;
+        color: #eee;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      .profile-dropdown a:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      /* ================= HERO ================= */
+      .hero {
+        height: 90vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 55px;
+        background: linear-gradient(90deg, #00dbde, #fc00ff);
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+
+      .btn-main {
+        margin-top: 20px;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #00dbde, #fc00ff);
+        color: white;
+      }
+
+      /* ================= MODAL ================= */
+      .auth-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 999;
+      }
+
+      .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
+
+      .auth-card {
+        width: 350px;
+        padding: 30px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(20px);
+        text-align: center;
+      }
+
+      .field {
+        position: relative;
+        margin-bottom: 18px;
+      }
+
+      .field input {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        background: white;
+      }
+
+      .field label {
+        position: absolute;
+        left: 12px;
+        top: 12px;
+        color: #666;
+        transition: 0.3s;
+      }
+
+      .field input:focus + label,
+      .field input:valid + label {
+        top: -8px;
+        font-size: 11px;
+        color: #00eaff;
+      }
+
+      .btn-login,
+      .btn-signup {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        color: white;
+      }
+
+      .btn-login {
+        background: linear-gradient(90deg, #00dbde, #fc00ff);
+      }
+
+      .btn-signup {
+        background: #28a745;
+      }
+
+      .btn-close {
+        margin-top: 10px;
+        width: 100%;
+        padding: 10px;
+        background: #dc3545;
+        border: none;
+        border-radius: 8px;
+        color: white;
+      }
+
+      .switch {
+        margin-top: 10px;
+      }
+
+      #authError {
+        color: red;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ================= NAVBAR ================= -->
+    <nav class="navbar-custom">
+      <a
+        href="/"
+        class="logo"
+        style="text-decoration: none; color: inherit; cursor: pointer"
+        >HireSense AI</a
+      >
+
+      <div class="nav-right">
+        {% if user.is_authenticated %}
+
+        <div class="profile-menu">
+          <button
+            class="profile-btn"
+            onclick="toggleProfileMenu()"
+            aria-label="Profile menu"
+          >
+            <span class="profile-icon"
+              >{{ user.username|slice:":1"|upper }}</span
+            >
+          </button>
+          <div class="profile-dropdown" id="profileDropdown">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/generate-resume">Generate Resume</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+
+        <a href="/pricing" class="btn-upgrade">Upgrade</a>
+
+        {% else %}
+
+        <button onclick="openAuth()" class="btn-login">Login</button>
+
+        {% endif %}
+      </div>
+    </nav>
+
+    <!-- ================= HERO ================= -->
+    <div class="hero">
+      <div class="animate__animated animate__fadeInDown">
+        <h1>AI Resume Screening Platform</h1>
+
+        <p>Analyze resumes using AI, ATS scoring and skill gap detection</p>
+
+        <button onclick="handleAnalyze()" class="btn-main">
+          Analyze Resume
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= AUTH MODAL ================= -->
+    <div id="authModal" class="auth-overlay">
+      <div class="auth-container">
+        <div class="auth-card animate__animated animate__zoomIn">
+          <h3 id="authTitle">Login</h3>
+
+          <!-- CSRF -->
+          <input type="hidden" id="csrfToken" value="{{ csrf_token }}" />
+
+          <!-- LOGIN -->
+          <form id="loginForm">
+            {% csrf_token %}
+
+            <div class="field">
+              <input type="text" name="username" required />
+              <label>Username</label>
+            </div>
+
+            <div class="field">
+              <input type="password" name="password" required />
+              <label>Password</label>
+            </div>
+
+            <button class="btn-login">Login</button>
+          </form>
+
+          <!-- SIGNUP -->
+          <form id="signupForm" style="display: none">
+            {% csrf_token %}
+
+            <div class="field">
+              <input type="text" name="username" required />
+              <label>Username</label>
+            </div>
+
+            <div class="field">
+              <input type="email" name="email" required />
+              <label>Email</label>
+            </div>
+
+            <div class="field">
+              <input type="password" name="password" required />
+              <label>Password</label>
+            </div>
+
+            <button class="btn-signup">Create Account</button>
+          </form>
+
+          <!-- OTP -->
+          <form id="otpForm" style="display: none">
+            {% csrf_token %}
+            <div class="field">
+              <input type="text" name="otp" required />
+              <label>Enter OTP</label>
+            </div>
+
+            <button class="btn-login">Verify OTP</button>
+          </form>
+
+          <div id="authError"></div>
+
+          <p class="switch">
+            <span id="toggleText">Don't have an account?</span>
+            <a onclick="toggleAuth()" id="toggleBtn">Sign Up</a>
+          </p>
+
+          <button onclick="closeAuth()" class="btn-close">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= JS ================= -->
+    <script>
+      // CSRF
+      function getCSRF() {
+        const token = document.querySelector(
+          'input[name="csrfmiddlewaretoken"]',
+        );
+        return token ? token.value : "";
+      }
+
+      // ELEMENTS
+      const loginForm = document.getElementById("loginForm");
+      const signupForm = document.getElementById("signupForm");
+      const otpForm = document.getElementById("otpForm");
+      const authError = document.getElementById("authError");
+
+      function openAuth() {
+        document.getElementById("authModal").style.display = "block";
+      }
+
+      function closeAuth() {
+        document.getElementById("authModal").style.display = "none";
+      }
+
+      function toggleAuth() {
+        authError.innerText = "";
+
+        if (loginForm.style.display === "none") {
+          loginForm.style.display = "block";
+          signupForm.style.display = "none";
+          otpForm.style.display = "none";
+
+          authTitle.innerText = "Login";
+          toggleText.innerText = "Don't have an account?";
+          toggleBtn.innerText = "Sign Up";
+        } else {
+          loginForm.style.display = "none";
+          signupForm.style.display = "block";
+          otpForm.style.display = "none";
+
+          authTitle.innerText = "Sign Up";
+          toggleText.innerText = "Already have an account?";
+          toggleBtn.innerText = "Login";
+        }
+      }
+
+      // LOGIN
+      loginForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        fetch("/login", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "X-CSRFToken": getCSRF(),
+          },
+          body: new FormData(this),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === "success") {
+              window.location.replace(data.redirect || "/");
+            } else {
+              authError.innerText = data.message;
+            }
+          });
+      });
+
+      // PROFILE MENU
+      function toggleProfileMenu() {
+        const dropdown = document.getElementById("profileDropdown");
+        dropdown.classList.toggle("show");
+      }
+
+      document.addEventListener("click", function (event) {
+        const dropdown = document.getElementById("profileDropdown");
+        const btn = document.querySelector(".profile-btn");
+        if (!btn.contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.classList.remove("show");
+        }
+      });
+
+      // SIGNUP
+      signupForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        let formData = new FormData(this);
+        let email = formData.get("email");
+
+        fetch("/signup", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "X-CSRFToken": getCSRF(),
+          },
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === "otp_sent") {
+              window.userEmail = email;
+
+              signupForm.style.display = "none";
+              otpForm.style.display = "block";
+              authTitle.innerText = "Verify OTP";
+            } else {
+              authError.innerText = data.message;
+            }
+          });
+      });
+
+      // OTP VERIFY
+      otpForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        let formData = new FormData(this);
+        formData.append("email", window.userEmail);
+
+        fetch("/verify-otp", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "X-CSRFToken": getCSRF(),
+          },
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("Account created!");
+              window.location.replace(data.redirect || "/");
+            } else {
+              authError.innerText = data.message;
+            }
+          });
+      });
+
+      // ANALYZE
+      function handleAnalyze() {
+        let isLoggedIn = "{{ request.user.is_authenticated }}";
+
+        if (isLoggedIn === "True") {
+          window.location = "/upload";
+        } else {
+          openAuth();
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Pricing - HireSense AI</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    />
+
+    <style>
+      /* BACKGROUND */
+      body {
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        color: white;
+        font-family: Segoe UI;
+      }
+
+      /* CARD */
+      .plan-card {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        transition: 0.3s;
+      }
+
+      .plan-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      /* TITLE */
+      .price {
+        font-size: 40px;
+        font-weight: bold;
+        color: #00eaff;
+      }
+
+      /* BUTTON */
+      .btn-premium {
+        background: linear-gradient(90deg, #00dbde, #fc00ff);
+        border: none;
+        color: white;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+
+  <body>
+    {% load custom_tags %}
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="/">HireSense AI</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="/dashboard">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/signup">Sign Up</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- CSRF Token -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+
+    <div class="container mt-5">
+      {% if user.is_authenticated %}
+      <div class="alert alert-info text-center">
+        {% if user|is_premium %}
+        <strong>You have an active Premium subscription!</strong>
+        {% else %}
+        <strong>Upgrade to Premium to unlock all features</strong>
+        {% endif %}
+      </div>
+      {% endif %} {% if not razorpay_configured %}
+      <div class="alert alert-warning text-center">
+        <strong>Payments are not configured.</strong> Set
+        <code>RAZORPAY_KEY_ID</code> and <code>RAZORPAY_KEY_SECRET</code> in
+        <code>settings.py</code> to enable payments.
+      </div>
+      {% endif %}
+
+      <div class="text-center mb-4">
+        <a href="/" class="btn btn-light btn-sm" style="font-weight: 600">
+          ← Back to Home
+        </a>
+      </div>
+
+      <h2 class="text-center mb-5">Choose Your Plan</h2>
+
+      <div class="row">
+        <!-- FREE PLAN -->
+        <div class="col-md-4">
+          <div class="plan-card">
+            <h3>Free Plan</h3>
+            <p class="price">₹0</p>
+
+            <ul class="text-start mt-4">
+              <li>✔ Resume Analysis</li>
+              <li>✔ ATS Score</li>
+              <li>✔ Skill Gap Analysis</li>
+              <li>❌ Resume Generator</li>
+              <li>❌ Premium Templates</li>
+            </ul>
+
+            <button class="btn btn-secondary mt-3 w-100">Current Plan</button>
+          </div>
+        </div>
+
+        <!-- MONTHLY PREMIUM PLAN -->
+        <div class="col-md-4">
+          <div class="plan-card">
+            <h3>Premium Monthly</h3>
+            <p class="price">₹99<span style="font-size: 16px">/month</span></p>
+
+            <ul class="text-start mt-4">
+              <li>✔ AI Resume Generator</li>
+              <li>✔ ATS Optimized Templates</li>
+              <li>✔ Advanced Suggestions</li>
+              <li>✔ Direct Resume Creation</li>
+              <li>✔ Priority Support</li>
+            </ul>
+
+            <button
+              onclick="upgradePlan('PREMIUM_MONTHLY')"
+              class="btn btn-premium mt-3 w-100"
+            >
+              Subscribe Monthly
+            </button>
+          </div>
+        </div>
+
+        <!-- YEARLY PREMIUM PLAN -->
+        <div class="col-md-4">
+          <div class="plan-card popular">
+            <div class="badge">Most Popular</div>
+            <h3>Premium Yearly</h3>
+            <p class="price">₹999<span style="font-size: 16px">/year</span></p>
+            <p style="color: #00eaff; font-size: 14px">Save ₹189/year</p>
+
+            <ul class="text-start mt-4">
+              <li>✔ Everything in Monthly</li>
+              <li>✔ 2 Months Free</li>
+              <li>✔ Advanced Analytics</li>
+              <li>✔ Custom Templates</li>
+              <li>✔ API Access</li>
+            </ul>
+
+            <button
+              onclick="upgradePlan('PREMIUM_YEARLY')"
+              class="btn btn-premium mt-3 w-100"
+            >
+              Subscribe Yearly
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Razorpay Modal -->
+    <div id="razorpayModal" class="modal fade" tabindex="-1">
+      <div class="modal-dialog">
+        <div
+          class="modal-content"
+          style="background: rgba(0, 0, 0, 0.9); color: white"
+        >
+          <div class="modal-header">
+            <h5 class="modal-title">Complete Payment</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body text-center">
+            <div id="paymentLoader" style="display: none">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p>Processing payment...</p>
+            </div>
+            <div id="paymentForm">
+              <p id="planDetails"></p>
+              <button id="payButton" class="btn btn-success">Pay Now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      const razorpayConfigured = {{ razorpay_configured|yesno:"true,false" }};
+      const razorpayKeyId = "{{ razorpay_key_id }}";
+      const isAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
+
+      let selectedPlan = "";
+      let orderData = null;
+
+      function upgradePlan(planType) {
+        if (!isAuthenticated) {
+          alert("Please log in to purchase a premium plan.");
+          window.location.href = "/login";
+          return;
+        }
+
+        if (!razorpayConfigured) {
+          alert("Payments are not configured yet. Please contact the site administrator.");
+          return;
+        }
+
+        selectedPlan = planType;
+        document.getElementById("paymentLoader").style.display = "block";
+        document.getElementById("paymentForm").style.display = "none";
+
+        // Create order
+        fetch("/create-razorpay-order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]")
+              .value,
+          },
+          body: "plan_type=" + planType,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              alert("Error: " + data.error);
+              return;
+            }
+
+            orderData = data;
+            const planDetails =
+              planType === "PREMIUM_MONTHLY"
+                ? "Premium Monthly - ₹99"
+                : "Premium Yearly - ₹999";
+
+            document.getElementById("planDetails").innerText = planDetails;
+            document.getElementById("paymentLoader").style.display = "none";
+            document.getElementById("paymentForm").style.display = "block";
+
+            // Show modal
+            new bootstrap.Modal(
+              document.getElementById("razorpayModal"),
+            ).show();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Failed to create payment order");
+          });
+      }
+
+      document
+        .getElementById("payButton")
+        .addEventListener("click", function () {
+          if (!orderData) {
+          alert("No payment order found. Please try subscribing again.");
+          return;
+        }
+
+        const options = {
+            key: orderData.key || razorpayKeyId,
+            amount: orderData.amount,
+            currency: "INR",
+            order_id: orderData.order_id,
+            name: "HireSense AI",
+            description:
+              selectedPlan === "PREMIUM_MONTHLY"
+                ? "Premium Monthly Subscription"
+                : "Premium Yearly Subscription",
+            handler: function (response) {
+              // Verify payment
+              fetch("/verify-payment", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                  "X-CSRFToken": document.querySelector(
+                    "[name=csrfmiddlewaretoken]",
+                  ).value,
+                },
+                body: `razorpay_order_id=${response.razorpay_order_id}&razorpay_payment_id=${response.razorpay_payment_id}&razorpay_signature=${response.razorpay_signature}&plan_type=${selectedPlan}`,
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data.status === "success") {
+                    alert(
+                      "Payment successful! Your premium subscription is now active.",
+                    );
+                    window.location.href = "/dashboard";
+                  } else {
+                    alert("Payment verification failed: " + data.error);
+                  }
+                });
+            },
+            prefill: {
+              name: "{{ user.first_name }} {{ user.last_name }}",
+              email: "{{ user.email }}",
+            },
+            theme: {
+              color: "#00dbde",
+            },
+          };
+
+          const rzp = new Razorpay(options);
+          rzp.open();
+        });
+    </script>
+
+    <style>
+      .popular {
+        border: 2px solid #00eaff;
+        position: relative;
+      }
+
+      .badge {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, #00dbde, #fc00ff);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .modal-content {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+    </style>
+  </body>
+</html>

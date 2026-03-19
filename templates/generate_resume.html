@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Premium Resume Generator - HireSense AI</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+
+    <style>
+      body {
+        background: linear-gradient(135deg, #141e30, #243b55);
+        color: white;
+        font-family: Segoe UI;
+        min-height: 100vh;
+      }
+
+      /* NAVBAR */
+      .navbar-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 40px;
+        background: #0a0a0a;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      }
+
+      .logo {
+        font-size: 20px;
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .profile-menu {
+        position: relative;
+      }
+
+      .profile-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.08);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.2s;
+      }
+
+      .profile-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-1px);
+      }
+
+      .profile-dropdown {
+        position: absolute;
+        right: 0;
+        top: 48px;
+        background: rgba(0, 0, 0, 0.85);
+        border-radius: 12px;
+        padding: 10px 0;
+        min-width: 150px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        display: none;
+        z-index: 50;
+      }
+
+      .profile-dropdown.show {
+        display: block;
+      }
+
+      .profile-dropdown a {
+        display: block;
+        padding: 10px 16px;
+        color: #eee;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      .profile-dropdown a:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .glass-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      }
+
+      .btn-generate {
+        background: linear-gradient(90deg, #00dbde, #fc00ff);
+        border: none;
+        color: white;
+        font-weight: bold;
+      }
+
+      .btn-generate:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px #00dbde;
+      }
+
+      .template-preview {
+        display: flex;
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .template-card {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .template-card.selected {
+        border: 2px solid #00dbde;
+        background: rgba(0, 219, 222, 0.1);
+      }
+
+      .template-card:hover {
+        transform: translateY(-5px);
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar-custom">
+      <div class="nav-left">
+        <a
+          href="/"
+          class="logo"
+          style="text-decoration: none; color: inherit; cursor: pointer"
+          >HireSense AI</a
+        >
+      </div>
+      <div class="nav-right">
+        {% if user.is_authenticated %}
+        <div class="profile-menu">
+          <button
+            class="profile-btn"
+            onclick="toggleProfileMenu()"
+            aria-label="Profile menu"
+          >
+            <span class="profile-icon"
+              >{{ user.username|slice:":1"|upper }}</span
+            >
+          </button>
+          <div class="profile-dropdown" id="profileDropdown">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </nav>
+
+    <div class="container py-5">
+      <h1 class="text-center mb-5 animate__animated animate__fadeInDown">
+        Premium Resume Generator
+      </h1>
+
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="glass-card animate__animated animate__fadeInUp">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label">Full Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+
+              <label class="form-label mt-4">Skills (comma-separated)</label>
+              <input type="text" name="skills" class="form-control" required />
+
+              <label class="form-label mt-4">Experience Summary</label>
+              <textarea
+                name="experience"
+                class="form-control"
+                rows="4"
+                required
+              ></textarea>
+
+              <label class="form-label mt-4">Target Role</label>
+              <select name="role" class="form-control">
+                <option value="software_engineer">Software Engineer</option>
+                <option value="data_scientist">Data Scientist</option>
+                <option value="product_manager">Product Manager</option>
+                <option value="designer">Designer</option>
+              </select>
+
+              <label class="form-label mt-4">Choose Template</label>
+              <div class="template-preview">
+                <div
+                  class="template-card"
+                  onclick="selectTemplate('modern')"
+                  id="modern-card"
+                >
+                  <h5>Modern</h5>
+                  <p>Clean, contemporary design with color accents</p>
+                  <input
+                    type="radio"
+                    name="template"
+                    value="modern"
+                    checked
+                    style="display: none"
+                  />
+                </div>
+                <div
+                  class="template-card"
+                  onclick="selectTemplate('classic')"
+                  id="classic-card"
+                >
+                  <h5>Classic</h5>
+                  <p>Traditional, professional layout</p>
+                  <input
+                    type="radio"
+                    name="template"
+                    value="classic"
+                    style="display: none"
+                  />
+                </div>
+              </div>
+
+              <button class="btn btn-generate mt-4 w-100">
+                Generate Resume PDF
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleProfileMenu() {
+        const dropdown = document.getElementById("profileDropdown");
+        dropdown.classList.toggle("show");
+      }
+
+      document.addEventListener("click", function (event) {
+        const dropdown = document.getElementById("profileDropdown");
+        const btn = document.querySelector(".profile-btn");
+        if (
+          dropdown &&
+          btn &&
+          !btn.contains(event.target) &&
+          !dropdown.contains(event.target)
+        ) {
+          dropdown.classList.remove("show");
+        }
+      });
+
+      function selectTemplate(template) {
+        document.querySelectorAll(".template-card").forEach((card) => {
+          card.classList.remove("selected");
+        });
+        document.getElementById(template + "-card").classList.add("selected");
+        document.querySelector(
+          `input[name="template"][value="${template}"]`,
+        ).checked = true;
+      }
+    </script>
+  </body>
+</html>

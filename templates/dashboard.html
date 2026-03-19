@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - HireSense AI</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: linear-gradient(
+          135deg,
+          #0f2027 0%,
+          #203a43 50%,
+          #2c5364 100%
+        );
+        color: white;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+      }
+      .navbar {
+        background: rgba(17, 17, 17, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(0, 234, 255, 0.2);
+        padding: 1rem 2rem;
+      }
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        background: linear-gradient(90deg, #00dbde, #fc00ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        cursor: pointer;
+      }
+      .container-main {
+        padding: 3rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(90deg, #00eaff, #00dbde);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .page-subtitle {
+        color: #aaa;
+        font-size: 1rem;
+      }
+      .premium-banner {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 234, 255, 0.2),
+          rgba(252, 0, 255, 0.1)
+        );
+        border: 1px solid rgba(0, 234, 255, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .premium-badge {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .premium-badge-icon {
+        font-size: 2rem;
+      }
+      .premium-badge-text h5 {
+        margin: 0;
+        color: #00eaff;
+        font-weight: 600;
+      }
+      .premium-badge-text p {
+        margin: 0.25rem 0 0 0;
+        color: #aaa;
+        font-size: 0.9rem;
+      }
+      .premium-widget {
+        background: rgba(0, 234, 255, 0.08);
+        border: 2px solid #00eaff;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+      }
+      .countdown-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: center;
+      }
+      .countdown-box h6 {
+        color: #aaa;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      .countdown-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #00eaff;
+        margin-bottom: 0.5rem;
+      }
+      .countdown-text {
+        color: #ccc;
+        font-size: 0.95rem;
+      }
+      .auto-renew-box {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .auto-renew-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+        border-radius: 8px;
+      }
+      .auto-renew-toggle label {
+        margin: 0;
+        font-weight: 500;
+        color: #fff;
+      }
+      .form-switch .form-check-input {
+        width: 50px;
+        height: 25px;
+      }
+      .auto-renew-status {
+        color: #aaa;
+        font-size: 0.9rem;
+      }
+      .auto-renew-status.enabled {
+        color: #28a745;
+      }
+      .free-banner {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 193, 7, 0.2),
+          rgba(255, 152, 0, 0.1)
+        );
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      .free-banner h5 {
+        color: #ffc107;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+      .result-card {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(0, 234, 255, 0.2);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+      }
+      .result-card:hover {
+        border-color: #00eaff;
+        background: rgba(0, 234, 255, 0.05);
+        transform: translateY(-2px);
+      }
+      .result-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #fff;
+      }
+      .score-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      .score-box {
+        background: rgba(0, 234, 255, 0.1);
+        border-left: 4px solid #00eaff;
+        padding: 1.5rem;
+        border-radius: 8px;
+      }
+      .score-label {
+        color: #aaa;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+      }
+      .score-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #00eaff;
+      }
+      .info-section {
+        margin: 1.5rem 0;
+      }
+      .info-section h6 {
+        color: #00eaff;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+      }
+      .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .info-list li {
+        padding: 0.5rem 0;
+        color: #ddd;
+        padding-left: 1.5rem;
+        position: relative;
+      }
+      .info-list li:before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: #00eaff;
+        font-weight: bold;
+      }
+      .gap-list li:before {
+        content: "⚠️";
+      }
+      .recommended-list li:before {
+        content: "✓";
+        color: #28a745;
+      }
+      .action-section {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(0, 234, 255, 0.2);
+        text-align: center;
+      }
+      .btn-gradient {
+        background: linear-gradient(90deg, #00dbde, #fc00ff);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+      .btn-gradient:hover {
+        transform: scale(1.05);
+        color: white;
+        box-shadow: 0 8px 20px rgba(0, 234, 255, 0.3);
+      }
+      .btn-light-outline {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+      .btn-light-outline:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #00eaff;
+        color: #00eaff;
+      }
+      .locked-feature-box {
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(255, 193, 7, 0.3);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+      }
+      .locked-feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+      .locked-feature-text {
+        color: #ffc107;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+      }
+      .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+      .empty-state-text {
+        color: #aaa;
+        margin-bottom: 2rem;
+      }
+      @media (max-width: 768px) {
+        .countdown-section {
+          grid-template-columns: 1fr;
+        }
+        .score-grid {
+          grid-template-columns: 1fr;
+        }
+        .page-title {
+          font-size: 1.8rem;
+        }
+        .premium-banner {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% load custom_tags %}
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+    <nav class="navbar">
+      <div
+        class="container-fluid d-flex justify-content-between align-items-center"
+      >
+        <a href="/" class="navbar-brand" style="text-decoration: none"
+          ><i class="fas fa-brain"></i> HireSense AI</a
+        >
+        <div>
+          <a href="/" class="btn btn-light-outline btn-sm"
+            ><i class="fas fa-home"></i> Home</a
+          >
+        </div>
+      </div>
+    </nav>
+    <div class="container-main">
+      <div class="mb-4">
+        <h1 class="page-title"><i class="fas fa-chart-line"></i> Dashboard</h1>
+        <p class="page-subtitle">Manage your subscription & resume analysis</p>
+      </div>
+
+      {% if is_premium %}
+      <div class="premium-banner">
+        <div class="premium-badge">
+          <div class="premium-badge-icon">👑</div>
+          <div class="premium-badge-text">
+            <h5>Premium Active</h5>
+            <p>{{ plan_name|title|replace_underscore }}</p>
+          </div>
+        </div>
+        <div>
+          <a href="/subscription-history" class="btn btn-light-outline btn-sm"
+            ><i class="fas fa-history"></i> View History</a
+          >
+        </div>
+      </div>
+      <div class="premium-widget">
+        <div class="countdown-section">
+          <div class="countdown-box">
+            <h6><i class="fas fa-hourglass-end"></i> Days Remaining</h6>
+            <div class="countdown-number" id="countdown">
+              {{ days_remaining }}
+            </div>
+            <p class="countdown-text">
+              Expires {{ premium_ends|date:"M d, Y" }}
+            </p>
+          </div>
+          <div class="auto-renew-box">
+            <div class="auto-renew-toggle">
+              <label for="autoRenewToggle"
+                ><i class="fas fa-redo"></i> Auto-Renew</label
+              >
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="autoRenewToggle"
+                  {%
+                  if
+                  auto_renew
+                  %}checked{%
+                  endif
+                  %}
+                />
+              </div>
+            </div>
+            <p class="auto-renew-status {% if auto_renew %}enabled{% endif %}">
+              {% if auto_renew %}<i class="fas fa-check-circle"></i>
+              Auto-renewal enabled{% else %}<i class="fas fa-info-circle"></i>
+              Manual renewal required{% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="free-banner">
+        <h5><i class="fas fa-star"></i> Upgrade to Premium</h5>
+        <p>Unlock AI Resume Generator and exclusive features</p>
+        <a href="/pricing" class="btn btn-gradient"
+          ><i class="fas fa-crown"></i> View Plans</a
+        >
+      </div>
+      {% endif %} {% if results %}
+      <h5
+        style="
+          color: #aaa;
+          text-transform: uppercase;
+          margin-bottom: 1.5rem;
+          margin-top: 2rem;
+        "
+      >
+        <i class="fas fa-file-alt"></i> Analysis Results
+      </h5>
+      {% for result in results %}
+      <div class="result-card">
+        <h4 class="result-title">{{ result.name }}</h4>
+        <div class="score-grid">
+          <div class="score-box">
+            <p class="score-label"><i class="fas fa-check"></i> Match Score</p>
+            <p class="score-value">{{ result.score }}/100</p>
+          </div>
+          <div class="score-box">
+            <p class="score-label"><i class="fas fa-robot"></i> ATS Score</p>
+            <p class="score-value">{{ result.ats }}/100</p>
+          </div>
+        </div>
+        {% if result.skills %}
+        <div class="info-section">
+          <h6><i class="fas fa-code"></i> Your Skills</h6>
+          <ul class="info-list">
+            {% for skill in result.skills %}
+            <li>{{ skill }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %} {% if result.gaps %}
+        <div class="info-section">
+          <h6><i class="fas fa-target"></i> Skill Gaps</h6>
+          <ul class="info-list gap-list">
+            {% for gap in result.gaps %}
+            <li>{{ gap }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %} {% if result.recommended %}
+        <div class="info-section">
+          <h6><i class="fas fa-lightbulb"></i> Recommended</h6>
+          <ul class="info-list recommended-list">
+            {% for skill in result.recommended %}
+            <li>{{ skill }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %} {% if result.negatives %}
+        <div class="info-section">
+          <h6><i class="fas fa-exclamation-triangle"></i> Areas to Improve</h6>
+          <ul class="info-list gap-list">
+            {% for item in result.negatives %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %} {% if result.improvements %}
+        <div class="info-section">
+          <h6><i class="fas fa-hammer"></i> Improvements</h6>
+          <ul class="info-list">
+            {% for item in result.improvements %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        <div class="action-section">
+          {% if result.pdf %}<a
+            href="/{{ result.pdf }}"
+            class="btn btn-gradient"
+            ><i class="fas fa-download"></i> Download Resume</a
+          >{% elif is_premium %}
+          <div style="text-align: center; color: #aaa">
+            <p>
+              <i class="fas fa-info-circle"></i> Resume generated and ready for
+              download
+            </p>
+            <a href="/upload" class="btn btn-light-outline btn-sm"
+              ><i class="fas fa-redo"></i> Upload Another Resume</a
+            >
+          </div>
+          {% else %}
+          <div class="locked-feature-box">
+            <div class="locked-feature-icon">🔒</div>
+            <p class="locked-feature-text">Premium Feature</p>
+            <p style="color: #ccc; margin-bottom: 1.5rem">
+              AI-Generated Resume available for Premium users
+            </p>
+            <a href="/pricing" class="btn btn-gradient"
+              ><i class="fas fa-crown"></i> Upgrade to Premium</a
+            >
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %} {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">📄</div>
+        <h4 style="margin-bottom: 0.5rem">No Analysis Yet</h4>
+        <p class="empty-state-text">Upload a resume to get started</p>
+        <a href="/upload" class="btn btn-gradient"
+          ><i class="fas fa-upload"></i> Upload Resume</a
+        >
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Auto-Renew Toggle Handler -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const toggle = document.getElementById("autoRenewToggle");
+      if (toggle) {
+        toggle.addEventListener("change", function () {
+          const csrf = document.querySelector(
+            '[name="csrfmiddlewaretoken"]',
+          )?.value;
+          fetch("/toggle-auto-renew", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              "X-CSRFToken": csrf || "",
+            },
+            body: "",
+          })
+            .then((r) => r.json())
+            .then((d) => {
+              if (d.status === "success") {
+                const s = document.querySelector(".auto-renew-status");
+                if (s)
+                  s.textContent = this.checked
+                    ? "✓ Auto-renewal enabled"
+                    : "ℹ️ Manual renewal required";
+                if (this.checked) s.classList.add("enabled");
+                else s.classList.remove("enabled");
+              } else {
+                alert("Error: " + d.error);
+                this.checked = !this.checked;
+              }
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
