@@ -439,6 +439,15 @@ def verify_payment(request):
         subscription.razorpay_payment_id = razorpay_payment_id
         subscription.activate_premium(plan_type)
 
+        # Record history
+        from subscription.models import SubscriptionHistory
+        SubscriptionHistory.objects.create(
+            user=subscription.user,
+            plan=subscription.plan,
+            action="PAYMENT_VERIFIED",
+            amount=subscription.amount
+        )
+
         return JsonResponse({"status": "success", "message": "Payment verified and subscription activated"})
 
     except razorpay.errors.SignatureVerificationError:
@@ -486,6 +495,14 @@ def razorpay_webhook(request):
 
                     subscription.razorpay_payment_id = payment_entity['id']
                     subscription.activate_premium(plan_type)
+
+                    from subscription.models import SubscriptionHistory
+                    SubscriptionHistory.objects.create(
+                        user=subscription.user,
+                        plan=subscription.plan,
+                        action='WEBHOOK_PAYMENT_CAPTURED',
+                        amount=subscription.amount
+                    )
 
             except Subscription.DoesNotExist:
                 pass  # Order not found, ignore

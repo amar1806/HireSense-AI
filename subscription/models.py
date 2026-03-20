@@ -47,3 +47,14 @@ class Subscription(models.Model):
         elif plan_type == "PREMIUM_YEARLY":
             self.end_date = timezone.now() + datetime.timedelta(days=365)
         self.save()
+
+
+class SubscriptionHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    plan = models.CharField(max_length=20, choices=Subscription.PLAN_CHOICES)
+    action = models.CharField(max_length=120, default='CREATED')
+    amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} ({self.plan}) - {self.action} @ {self.created_at:%Y-%m-%d %H:%M:%S}"
