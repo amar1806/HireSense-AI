@@ -106,6 +106,12 @@
       </div>
       {% endif %} {% if not razorpay_configured %}
       <div class="alert alert-warning text-center">
+        <strong>Payments are not configured.</strong>
+        Your admin must set Razorpay keys in environment variables before
+        subscriptions work.
+      </div>
+      {% endif %}
+      <div class="alert alert-warning text-center">
         <strong>Payments are not configured.</strong> set environment variables
         <code>RAZORPAY_KEY_ID</code> and <code>RAZORPAY_KEY_SECRET</code> (or
         add to <code>.env</code> and load in settings) and restart the server.
@@ -156,8 +162,18 @@
             <button
               onclick="upgradePlan('PREMIUM_MONTHLY')"
               class="btn btn-premium mt-3 w-100"
+              {%
+              if
+              not
+              razorpay_configured
+              %}disabled
+              title="Payment system needs setup"
+              {%
+              endif
+              %}
             >
-              Subscribe Monthly
+              {% if razorpay_configured %}Subscribe Monthly{% else %}Premium
+              setup required{% endif %}
             </button>
           </div>
         </div>
@@ -181,8 +197,18 @@
             <button
               onclick="upgradePlan('PREMIUM_YEARLY')"
               class="btn btn-premium mt-3 w-100"
+              {%
+              if
+              not
+              razorpay_configured
+              %}disabled
+              title="Payment system needs setup"
+              {%
+              endif
+              %}
             >
-              Subscribe Yearly
+              {% if razorpay_configured %}Subscribe Yearly{% else %}Premium
+              setup required{% endif %}
             </button>
           </div>
         </div>
