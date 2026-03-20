@@ -287,7 +287,15 @@ def generate_resume(request):
         with open(pdf_path, 'rb') as pdf_file:
             response = HttpResponse(pdf_file.read(), content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="{name}_resume.pdf"'
-            return response
+
+        # Cleanup generated file after download
+        try:
+            if os.path.exists(pdf_path):
+                os.remove(pdf_path)
+        except Exception:
+            pass
+
+        return response
 
     return render(request, "generate_resume.html")
 
@@ -338,8 +346,11 @@ from django.conf import settings
 from django.http import JsonResponse
 from subscription.models import Subscription
 
-# Initialize Razorpay client
-razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+def get_razorpay_client():
+    key_id = getattr(settings, 'RAZORPAY_KEY_ID', '')
+    key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', '')
+    return razorpay.Client(auth=(key_id, key_secret))
+
 
 def create_razorpay_order(request):
     if not request.user.is_authenticated:
@@ -374,7 +385,7 @@ def create_razorpay_order(request):
     }
 
     try:
-        order = razorpay_client.order.create(data=order_data)
+        order = get_razorpay_client().order.create(data=order_data)
 
         # Save order details in subscription
         subscription, created = Subscription.objects.get_or_create(
@@ -417,7 +428,7 @@ def verify_payment(request):
             'razorpay_signature': razorpay_signature
         }
 
-        razorpay_client.utility.verify_payment_signature(params_dict)
+        get_razorpay_client().utility.verify_payment_signature(params_dict)
 
         # Update subscription
         subscription = Subscription.objects.get(
@@ -446,7 +457,7 @@ def razorpay_webhook(request):
     webhook_body = request.body.decode('utf-8')
 
     try:
-        razorpay_client.utility.verify_webhook_signature(
+        get_razorpay_client().utility.verify_webhook_signature(
             webhook_body,
             webhook_signature,
             settings.RAZORPAY_WEBHOOK_SECRET
